@@ -7,6 +7,7 @@ import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.andengine.entity.primitive.Ellipse;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.Scene.IOnSceneTouchListener;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import android.app.Activity;
@@ -71,11 +73,21 @@ public class MainActivity extends SimpleBaseGameActivity {
 		this.mEngine.registerUpdateHandler(new FPSLogger());
 		
 		this.mScene = new Scene();
-		this.mScene.setBackground(new Background(250,250,250));
+		this.mScene.setBackground(new Background(0,0,0));
 		
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);
 		
 		final VertexBufferObjectManager vertexBufferObjectManager = this.getVertexBufferObjectManager(); 
+		final Rectangle rect = new Rectangle(CAMERA_WIDTH/2, 5 , 10, 10, vertexBufferObjectManager);
+		
+		final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
+		
+		final Body rectBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.DynamicBody, ballDef);
+		
+		this.mScene.attachChild(rect);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(rect,rectBody,true,true));
+		
+		this.mScene.registerUpdateHandler(this.mPhysicsWorld);
 		
 		return this.mScene;
 	}
