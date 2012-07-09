@@ -44,7 +44,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
-public class MainActivity extends SimpleBaseGameActivity {
+public class MainActivity extends SimpleBaseGameActivity implements IAccelerationListener {
 
 	private static int CAMERA_WIDTH = 400;
 	private static int CAMERA_HEIGHT = 800;
@@ -78,18 +78,52 @@ public class MainActivity extends SimpleBaseGameActivity {
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);
 		
 		final VertexBufferObjectManager vertexBufferObjectManager = this.getVertexBufferObjectManager(); 
+		// falling rectangle
 		final Rectangle rect = new Rectangle(CAMERA_WIDTH/2, 5 , 10, 10, vertexBufferObjectManager);
 		
+		final Rectangle ground = new Rectangle(0,CAMERA_HEIGHT - 1, CAMERA_WIDTH, 2, vertexBufferObjectManager);
+		final Rectangle left = new Rectangle(0, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
+		final Rectangle right = new Rectangle(CAMERA_WIDTH - 1, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
+		
 		final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
+		
+		PhysicsFactory.createBoxBody(this.mPhysicsWorld, ground, BodyType.StaticBody,ballDef);
+		PhysicsFactory.createBoxBody(this.mPhysicsWorld, left, BodyType.StaticBody,ballDef);
+		PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody,ballDef);
 		
 		final Body rectBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.DynamicBody, ballDef);
 		
 		this.mScene.attachChild(rect);
+		this.mScene.attachChild(ground);
+		this.mScene.attachChild(left);
+		this.mScene.attachChild(right);
+		
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(rect,rectBody,true,true));
 		
 		this.mScene.registerUpdateHandler(this.mPhysicsWorld);
 		
 		return this.mScene;
+	}
+	
+	@Override
+	public void onResumeGame() {
+		super.onResumeGame();
+		
+		this.enableAccelerationSensor(this);
+	}
+
+	@Override
+	public void onAccelerationAccuracyChanged(AccelerationData pAccelerationData) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	@Override
+	public void onAccelerationChanged(AccelerationData pAccelerationData) {
+		final Vector2 gravity = Vector2Pool.obtain(pAccelerationData.getX(), pAccelerationData.getY());
+		this.mPhysicsWorld.setGravity(gravity);
+		Vector2Pool.recycle(gravity);
 	}
 
 
