@@ -14,6 +14,7 @@ import org.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.entity.sprite.AnimatedSprite;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
@@ -80,6 +81,8 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		final VertexBufferObjectManager vertexBufferObjectManager = this.getVertexBufferObjectManager(); 
 		// falling rectangle
 		final Rectangle rect = new Rectangle(CAMERA_WIDTH/2, 5 , 10, 10, vertexBufferObjectManager);
+		
+		final Sprite ball = new Sprite(0, 0, 0, 0, null, vertexBufferObjectManager);
 		
 		final Rectangle ground = new Rectangle(0,CAMERA_HEIGHT - 1, CAMERA_WIDTH, 2, vertexBufferObjectManager);
 		final Rectangle left = new Rectangle(0, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
