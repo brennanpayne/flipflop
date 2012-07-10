@@ -153,9 +153,13 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		if(this.mPhysicsWorld != null) {
 			if(pSceneTouchEvent.isActionDown()) {
 				
+				final float x = pSceneTouchEvent.getX();
+				final float y = pSceneTouchEvent.getY();
 				final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
-				final Rectangle rect = new Rectangle(CAMERA_WIDTH/2, 5 , 10, 10, this.getVertexBufferObjectManager());
+				
+				final Rectangle rect = new Rectangle(x, y, 10, 10, this.getVertexBufferObjectManager());
 				final Body rectBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.DynamicBody, ballDef);
+				
 				this.mScene.attachChild(rect);
 				this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(rect,rectBody,true,true));
 				
