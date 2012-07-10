@@ -91,6 +91,7 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		
 	}
 
+
 	@Override
 	protected Scene onCreateScene() {
 		this.mEngine.registerUpdateHandler(new FPSLogger());
@@ -99,32 +100,38 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		this.mScene.setBackground(new Background(0,0,0));
 		
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);
-	
-		
+
 		final VertexBufferObjectManager vertexBufferObjectManager = this.getVertexBufferObjectManager(); 
+		final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
+		
+		
 		// falling rectangle
 		// final Rectangle rect = new Rectangle(CAMERA_WIDTH/2, 5 , 10, 10, vertexBufferObjectManager);
 		
 		//rect.setColor(0,191,255);
 		
 		final Sprite ball = new Sprite(CAMERA_WIDTH/2, 5, 32, 32, this.mCircleTextureRegion, vertexBufferObjectManager);
-		
+
+		// final Sprite ball = new Sprite(0, 0, 0, 0, null, vertexBufferObjectManager);
+
 		//final Ellipse circle = new Ellipse(CAMERA_WIDTH/2, 5, 10, 10, vertexBufferObjectManager);
+
 		
 		final Rectangle ground = new Rectangle(0,CAMERA_HEIGHT - 1, CAMERA_WIDTH, 2, vertexBufferObjectManager);
 		final Rectangle left = new Rectangle(0, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
 		final Rectangle right = new Rectangle(CAMERA_WIDTH - 1, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
 		
+
 		
+		final FixtureDef ballDef1 = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
+
 		
-		final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
-		
-		PhysicsFactory.createBoxBody(this.mPhysicsWorld, ground, BodyType.StaticBody,ballDef);
-		PhysicsFactory.createBoxBody(this.mPhysicsWorld, left, BodyType.StaticBody,ballDef);
-		PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody,ballDef);
+		PhysicsFactory.createBoxBody(this.mPhysicsWorld, ground, BodyType.StaticBody,ballDef1);
+		PhysicsFactory.createBoxBody(this.mPhysicsWorld, left, BodyType.StaticBody,ballDef1);
+		PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody,ballDef1);
 		
 		//final Body rectBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.DynamicBody, ballDef);
-		final Body ballBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld, ball, BodyType.DynamicBody, ballDef);
+		final Body ballBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld, ball, BodyType.DynamicBody, ballDef1);
 		
 		//this.mScene.attachChild(rect);
 		this.mScene.attachChild(ball);
@@ -134,10 +141,28 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		
 		//this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(rect,rectBody,true,true));
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(ball, ballBody, true, true));
+
 		
 		this.mScene.registerUpdateHandler(this.mPhysicsWorld);
 		
 		return this.mScene;
+	}
+	
+	public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
+		if(this.mPhysicsWorld != null) {
+			if(pSceneTouchEvent.isActionDown()) {
+				
+				final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
+				final Rectangle rect = new Rectangle(CAMERA_WIDTH/2, 5 , 10, 10, this.getVertexBufferObjectManager());
+				final Body rectBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.DynamicBody, ballDef);
+				this.mScene.attachChild(rect);
+				this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(rect,rectBody,true,true));
+				
+				this.mScene.registerUpdateHandler(this.mPhysicsWorld);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
