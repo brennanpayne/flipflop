@@ -63,6 +63,9 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 	
 	private PhysicsWorld mPhysicsWorld;
 	
+	private float startX;
+	private float startY;
+	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -118,11 +121,10 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		//final Ellipse circle = new Ellipse(CAMERA_WIDTH/2, 5, 10, 10, vertexBufferObjectManager);
 
 		
-		final Rectangle ground = new Rectangle(0,CAMERA_HEIGHT - 1, CAMERA_WIDTH, 2, vertexBufferObjectManager);
+		final Rectangle ground = new Rectangle(0,CAMERA_HEIGHT - 2, CAMERA_WIDTH, 2, vertexBufferObjectManager);
 		final Rectangle left = new Rectangle(0, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
-		final Rectangle right = new Rectangle(CAMERA_WIDTH - 1, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
+		final Rectangle right = new Rectangle(CAMERA_WIDTH - 2, 0, 2, CAMERA_HEIGHT, vertexBufferObjectManager);
 		
-
 		
 		final FixtureDef ballDef1 = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
 
@@ -133,6 +135,7 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		
 		//final Body rectBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.DynamicBody, ballDef);
 		final Body ballBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld, ball, BodyType.DynamicBody, ballDef1);
+		
 		
 		//this.mScene.attachChild(rect);
 		this.mScene.attachChild(ball);
@@ -152,13 +155,32 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 	public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
 		if(this.mPhysicsWorld != null) {
 			if(pSceneTouchEvent.isActionDown()) {
+				this.startX = pSceneTouchEvent.getX();
+				this.startY = pSceneTouchEvent.getY();
+				// this.addBall(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+				return true;
+			}
+			if(pSceneTouchEvent.isActionUp()) {
+				final float dX = pSceneTouchEvent.getX() - this.startX;
+				final float dY = pSceneTouchEvent.getY() - this.startY;
 				
-				final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
-				final Rectangle rect = new Rectangle(CAMERA_WIDTH/2, 5 , 10, 10, this.getVertexBufferObjectManager());
-				final Body rectBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.DynamicBody, ballDef);
+				final float startXFinal = this.startX;
+				final float startYFinal = this.startY;
+				float rectLength = (float) Math.hypot(dX, dY);
+				float rotation = (float) (Math.atan(dY/dX) * 180 / (Math.PI));
+				
+				/*if (dY > 0)
+					rotation *= -1;*/
+				if (dX < 0)
+					rotation = 180 + rotation;
+					
+				final Rectangle rect = new Rectangle(startXFinal, startYFinal, rectLength, 2, this.getVertexBufferObjectManager());
+				rect.setRotationCenter(0, 0);
+				rect.setRotation(rotation);
+				
+				final FixtureDef rectFixtureDef = PhysicsFactory.createFixtureDef(0.5f,0.5f,0.5f);
+				PhysicsFactory.createBoxBody(this.mPhysicsWorld, rect, BodyType.StaticBody, rectFixtureDef);
 				this.mScene.attachChild(rect);
-				this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(rect,rectBody,true,true));
-				
 				return true;
 			}
 		}
@@ -186,4 +208,16 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		Vector2Pool.recycle(gravity);
 	}
     
+	private void addBall(final float pX, final float pY)
+	{
+		final Sprite sprite;
+		final Body body;
+		
+		final FixtureDef ballDef = PhysicsFactory.createFixtureDef(0.5f, 0.5f, 0.5f);
+		
+		sprite = new Sprite(pX, pY, 32, 32, this.mCircleTextureRegion, this.getVertexBufferObjectManager());
+		body = PhysicsFactory.createCircleBody(this.mPhysicsWorld, sprite, BodyType.DynamicBody, ballDef);
+		this.mScene.attachChild(sprite);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(sprite, body));
+	}
 }
