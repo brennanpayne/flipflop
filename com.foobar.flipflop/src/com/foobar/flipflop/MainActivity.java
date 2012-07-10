@@ -80,6 +80,7 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		this.mCircleTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "ball.png");
 		
 		try {
+			// what the hell is a BlackPawnTextureAtlasBuilder?!
 			this.mBitmapTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0,0,0));
 			this.mBitmapTextureAtlas.load();
 		} catch (TextureAtlasBuilderException e) {
@@ -159,7 +160,5 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		this.mPhysicsWorld.setGravity(gravity);
 		Vector2Pool.recycle(gravity);
 	}
-
-
     
 }
