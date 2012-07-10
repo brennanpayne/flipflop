@@ -98,6 +98,7 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 		
 		this.mScene = new Scene();
 		this.mScene.setBackground(new Background(0,0,0));
+		this.mScene.setOnSceneTouchListener(this);
 		
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);
 
@@ -158,7 +159,6 @@ public class MainActivity extends SimpleBaseGameActivity implements IAcceleratio
 				this.mScene.attachChild(rect);
 				this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(rect,rectBody,true,true));
 				
-				this.mScene.registerUpdateHandler(this.mPhysicsWorld);
 				return true;
 			}
 		}
